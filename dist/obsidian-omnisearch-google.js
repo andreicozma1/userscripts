@@ -166,7 +166,7 @@
 			onload: function (res) {
 				const data = JSON.parse(res.response);
 
-				console.log('Omnisearch results', data);
+				// console.log('Omnisearch results', data);
 
 				removeLoadingLabel(data.length > 0);
 				data.splice(nbResults);
