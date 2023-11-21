@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 // ==UserScript==
 // @name         Obsidian Omnisearch in Google
 // @namespace    https://github.com/andreicozma1/userscripts
@@ -21,7 +21,7 @@
 // ==/UserScript==
 /* globals GM_config, jQuery, $, waitForKeyElements */
 (function () {
-	"use strict";
+	'use strict';
 	// Google's right "sidebar" that will contain the results div
 	const sidebarSelector = '#rhs';
 	// The results div
@@ -42,7 +42,7 @@
 			nbResults: {
 				label: 'Number of results to display',
 				type: 'int',
-				default: 10,
+				default: 6,
 			},
 		},
 		events: {
@@ -74,6 +74,13 @@
 	background: #fff;
 	border: 1px solid #dadce0;
 	border-radius: 8px;
+}
+
+#OmnisearchObsidianLoading {
+    color: #4d5156;
+    font-family: Google Sans,Roboto,arial,sans-serif;
+    font-size: 14px;
+    line-height: 22px;
 }
 
 .omnisearch-header {
@@ -140,6 +147,19 @@
   margin-right: 2px;
   margin-bottom: 2px;
 }
+
+.show-more-btn {
+	display: block;
+	width: 100%;
+	padding: 10px 0;
+	margin: 10px 0;
+	background: #f8f9fa;
+	border: none;
+	border-radius: 4px;
+	font-size: 14px;
+	cursor: pointer;
+	text-align: center;
+  }
 `;
 
 	// Add the CSS to the document head
@@ -164,22 +184,30 @@
 				'Content-Type': 'application/json',
 			},
 			onload: function (res) {
-				const data = JSON.parse(res.response);
+				const allResults = JSON.parse(res.response);
+				console.log('Omnisearch results', allResults);
 
-				// console.log('Omnisearch results', data);
+				if (allResults.length > 0) {
+					$('#' + loadingSpanId).remove();
+				} else {
+					$('#' + loadingSpanId).text('No results found');
+					return;
+				}
 
-				removeLoadingLabel(data.length > 0);
-				data.splice(nbResults);
+				allResults.splice(nbResults);
 
-				const maxScore = Math.max(...data.map((item) => item.score));
+				// Set the initial number of results to display
+				const initialDisplayCount = 3;
+				// Display the first `initialDisplayCount` results
+				const initialResults = allResults.slice(0, initialDisplayCount);
+
+				const maxScore = Math.max(...allResults.map((item) => item.score));
 
 				// Empty the div and add a title for the results
 				const resultsDiv = $(`#${resultsDivId}`);
-				resultsDiv.empty();
 
-				resultsDiv.append(
-					'<div class="omnisearch-header">Omnisearch results</div>'
-				);
+				const header =
+					'<div class="omnisearch-header">Omnisearch results</div>';
 
 				function getScoreColor(score, maxScore) {
 					// Normalize the score to a 0-1 scale
@@ -190,8 +218,7 @@
 					return `rgb(${red}, ${green}, 0)`;
 				}
 
-				// Iterate over the results to create the structured layout
-				data.forEach((item) => {
+				function getResultItem(item) {
 					const url = `obsidian://open?vault=${encodeURIComponent(
 						item.vault
 					)}&file=${encodeURIComponent(item.path)}`;
@@ -202,7 +229,8 @@
 						<div class="score-indicator" style="background-color: ${getScoreColor(
 							item.score,
 							maxScore
-						)};"></div>
+						)};" title="Score: ${item.score}">
+						</div>
 						<a href="${url}" class="omnisearch-title">${item.basename}</a>
 						<div class="omnisearch-excerpt">${excerpt}</div>
 						<div class="expand-arrow">
@@ -217,8 +245,49 @@
 						$(this).toggleClass('expanded');
 					});
 
-					resultsDiv.append(resultItem);
-				});
+					return resultItem;
+				}
+
+				function showAllResults() {
+					resultsDiv.empty();
+					// resultsDiv.append(header);
+					// show the rest of the results
+					allResults.forEach((item) => {
+						resultsDiv.append(getResultItem(item));
+					});
+
+					if (allResults.length > initialDisplayCount) {
+						const lessBtn = $(
+							`<button class="show-more-btn">Show less</button>`
+						).on('click', function () {
+							showInitialResults();
+						});
+						resultsDiv.append(lessBtn);
+					}
+				}
+
+				function showInitialResults() {
+					resultsDiv.empty();
+					// resultsDiv.append(header);
+					// show the first `initialDisplayCount` results
+					initialResults.forEach((item) => {
+						resultsDiv.append(getResultItem(item));
+					});
+
+					if (allResults.length > initialDisplayCount) {
+						const moreBtn = $(
+							`<button class="show-more-btn">${
+								allResults.length - initialDisplayCount
+							} more</button>`
+						).on('click', function () {
+							showAllResults();
+						});
+						resultsDiv.append(moreBtn);
+					}
+				}
+
+				// Show the initial results
+				showInitialResults();
 			},
 			onerror: function (res) {
 				console.error('Omnisearch error', res);
@@ -235,8 +304,14 @@
 		const id = 'OmnisearchObsidianConfig';
 		if (!$('#' + id)[0]) {
 			const btn = $(`<div style="margin-bottom: 1em">
-          <span style="font-size: 18px">${logo}&nbspOmnisearch results</span>
-          <span style="font-size: 12px">(<a id=${id} class="feedback-link-btn" title="Settings" href="#">settings</a>)</span>
+		  <div class="omnisearch-header">
+		  <span>
+		  Omnisearch results
+		  </span>
+          <span style="font-size: 10px">
+		  (<a id=${id} class="feedback-link-btn" title="Settings" href="#">settings</a>)
+		  </span>
+		  </div>
         </div>`);
 			$(`#${resultsDivId}`).append(btn);
 			$(document).on('click', '#' + id, function () {
@@ -256,13 +331,7 @@
 			$(`#${resultsDivId}`).append(label);
 		}
 	}
-	function removeLoadingLabel(foundResults = true) {
-		if (foundResults) {
-			$('#' + loadingSpanId).remove();
-		} else {
-			$('#' + loadingSpanId).text('No results found');
-		}
-	}
+
 	console.log('Loading Omnisearch injector');
 	let init = onInit(gmc);
 	init.then(() => {
