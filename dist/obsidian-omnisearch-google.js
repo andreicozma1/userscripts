@@ -81,6 +81,7 @@
     line-height: 24px;
     color: #202124;
 	padding: 12px 16px;
+	border-bottom: 1px solid #e0e0e0;
 }
 
 .omnisearch-result {
@@ -95,10 +96,7 @@
 
 .omnisearch-title {
     font-size: 16px;
-    font-weight: normal;
 	font-family: Google Sans,Roboto,arial,sans-serif;
-    margin: 0;
-    display: block; /* Ensure it's block level for correct line breaks */
 }
 
 .omnisearch-excerpt {
@@ -121,8 +119,7 @@
     cursor: pointer;
     position: absolute;
     right: 16px;
-    top: 8px; /* Keeps the arrow at the top */
-    transition: transform 0.3s ease-in-out;
+    top: 8px;
 }
 
 .expand-arrow svg {
@@ -136,15 +133,12 @@
 }
 
 .score-indicator {
-  height: 10px;
-  width: 10px;
+  height: 6px;
+  width: 6px;
   border-radius: 50%;
   display: inline-block;
-  margin-right: 5px;
-}
-
-.match-highlight {
-  font-weight: bold;
+  margin-right: 2px;
+  margin-bottom: 2px;
 }
 `;
 
