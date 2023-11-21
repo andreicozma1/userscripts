@@ -2,8 +2,8 @@
 // ==UserScript==
 // @name         Obsidian Omnisearch in Google
 // @namespace    https://github.com/andreicozma1/userscripts
-// @downloadURL  https://github.com/andreicozma1/userscripts/raw/main/dist/obsidian-omnisearch-google.user.js
-// @updateURL    https://github.com/andreicozma1/userscripts/raw/main/dist/obsidian-omnisearch-google.user.js
+// @downloadURL  https://raw.githubusercontent.com/andreicozma1/userscripts/main/dist/obsidian-omnisearch-google.js
+// @updateURL    https://raw.githubusercontent.com/andreicozma1/userscripts/main/dist/obsidian-omnisearch-google.js
 // @version      0.3.3
 // @description  Injects Obsidian notes in Google search results (based on scambier/userscripts)
 // @author       Andrei Cozma
