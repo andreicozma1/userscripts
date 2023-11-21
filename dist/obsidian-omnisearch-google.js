@@ -1,10 +1,10 @@
-'use strict';
+"use strict";
 // ==UserScript==
 // @name         Obsidian Omnisearch in Google
 // @namespace    https://github.com/andreicozma1/userscripts
-// @downloadURL  https://raw.githubusercontent.com/andreicozma1/userscripts/main/dist/obsidian-omnisearch-google.js
-// @updateURL    https://raw.githubusercontent.com/andreicozma1/userscripts/main/dist/obsidian-omnisearch-google.js
-// @version      0.3.3
+// @downloadURL  https://github.com/andreicozma1/userscripts/raw/main/dist/obsidian-omnisearch-google.user.js
+// @updateURL    https://github.com/andreicozma1/userscripts/raw/main/dist/obsidian-omnisearch-google.user.js
+// @version      0.3.4
 // @description  Injects Obsidian notes in Google search results (based on scambier/userscripts)
 // @author       Andrei Cozma
 // @match        https://google.com/*
@@ -21,7 +21,7 @@
 // ==/UserScript==
 /* globals GM_config, jQuery, $, waitForKeyElements */
 (function () {
-	'use strict';
+	"use strict";
 	// Google's right "sidebar" that will contain the results div
 	const sidebarSelector = '#rhs';
 	// The results div
